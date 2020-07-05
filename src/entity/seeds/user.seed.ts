@@ -19,9 +19,9 @@ export default async function generateUser(count: number = 1) {
     user.firstname = faker.name.firstName(gender);
     user.lastname = faker.name.lastName(gender);
     user.email = faker.internet.email();
-    user.password = faker.random.word();
+    user.password = "password";
     user.hashPassword();
-    user.role = _.sample(findAllRole);
+    user.roles = _.sample(findAllRole, 2);
     generatedUsers.push(user);
   }
 

@@ -4,9 +4,9 @@ import { checkJwt } from "../middlewares/checkJwt";
 
 const router = Router();
 // Login route
-router.post("/login", AuthController.login);
+router.post("/login", AuthController.Login);
 
-// Change my password
-router.post("/change-password", [checkJwt], AuthController.changePassword);
+// Login route
+router.get("/me", [checkJwt], AuthController.getSelfInformation);
 
 export default router;

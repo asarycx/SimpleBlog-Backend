@@ -15,9 +15,9 @@ export class Permission extends General {
   @Length(4, 128)
   description: string;
 
-  @ManyToMany((type) => Role, (role) => role.permissions)
+  @ManyToMany((type) => Role, { eager: false })
   roles: Role[];
 
-  @ManyToMany((type) => User, (user) => user.permissions)
+  @ManyToMany((type) => User, { eager: false })
   users: User[];
 }

@@ -47,15 +47,11 @@ export class User extends General {
   @Column({ nullable: true, type: "text" })
   profile_image?: string;
 
-  @ManyToOne((type) => Role, (role) => role.users, {
-    eager: true,
-    onDelete: "SET NULL",
-  })
-  role?: Role;
+  @ManyToMany((type) => Role, { eager: false })
+  @JoinTable()
+  roles?: Role[];
 
-  @ManyToMany((type) => Permission, (permission) => permission.users, {
-    eager: true,
-  })
+  @ManyToMany((type) => Permission, { eager: true })
   @JoinTable()
   permissions?: Permission[];
 

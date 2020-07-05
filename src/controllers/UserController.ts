@@ -1,122 +1,291 @@
 import { Request, Response } from "express";
-import { getRepository } from "typeorm";
-import { validate } from "class-validator";
+import { getRepository, Like, Not, IsNull } from "typeorm";
+import { failed, success } from "@util/responseParser";
+
+import * as _ from "underscore";
 
 import { User } from "@entity/User";
+import { Permission } from "@entity/Permission";
+import { Role } from "@entity/Role";
 
 class UserController {
-  static listAll = async (req: Request, res: Response) => {
-    // Get users from database
-    const userRepository = getRepository(User);
-    const users = await userRepository.find({
-      select: ["id", "username", "role"], // We dont want to send the passwords on response
-    });
-
-    // Send the users object
-    res.send(users);
-  };
-
-  static getOneById = async (req: Request, res: Response) => {
-    // Get the ID from the url
-    const id: string = req.params.id;
-
-    // Get the user from database
-    const userRepository = getRepository(User);
+  /**
+   * Index
+   * @param request
+   * @param response
+   */
+  public static async Index(request: Request, response: Response) {
     try {
-      const user = await userRepository.findOneOrFail(id, {
-        select: ["id", "username", "role"], // We dont want to send the password on response
+      // Prepare User Repository
+      const UserRepository = getRepository(User);
+
+      // Prepare the Pagination Variables
+      const page = Number(request.query.page) || 1;
+      const per_page = Number(request.query.per_page) || 4;
+      const sort = request.query.sort == "ASC" ? "ASC" : "DESC";
+      const keyword = Boolean(request.query.keyword)
+        ? request.query.keyword
+        : null;
+
+      // Fetch the Data with prepared Variables
+      var userData = await UserRepository.findAndCount({
+        withDeleted: true,
+        take: per_page,
+        skip: page * per_page - per_page,
+        where: [
+          { firstname: keyword ? Like(`%${keyword}%`) : Not(IsNull()) },
+          { lastname: keyword ? Like(`%${keyword}%`) : Not(IsNull()) },
+          { email: keyword ? Like(`%${keyword}%`) : Not(IsNull()) },
+          { username: keyword ? Like(`%${keyword}%`) : Not(IsNull()) },
+        ],
+        order: {
+          id: sort,
+        },
+        relations: ["roles"],
       });
-    } catch (error) {
-      res.status(404).send("User not found");
-    }
-  };
 
-  static newUser = async (req: Request, res: Response) => {
-    // Get parameters from the body
-    const { username, password, role } = req.body;
-    const user = new User();
-    user.username = username;
-    user.password = password;
-    user.role = role;
-
-    // Validade if the parameters are ok
-    const errors = await validate(user);
-    if (errors.length > 0) {
-      res.status(400).send(errors);
-      return;
-    }
-
-    // Hash the password, to securely store on DB
-    user.hashPassword();
-
-    // Try to save. If fails, the username is already in use
-    const userRepository = getRepository(User);
-    try {
-      await userRepository.save(user);
+      // Return the result with 200
+      return response.status(200).send(
+        success({
+          name: "SuccessFetchAllUserData",
+          message: "",
+          data: {
+            data: userData[0],
+            meta: {
+              page: page,
+              per_page: per_page,
+              keyword: keyword,
+              total_item: userData[1] || 0,
+              total_page: userData[0] ? Math.ceil(userData[1] / per_page) : 0,
+            },
+          },
+        })
+      );
     } catch (e) {
-      res.status(409).send("username already in use");
-      return;
+      // Return Error Result
+      return response.status(e.status).send(failed(e));
     }
-
-    // If all ok, send 201 response
-    res.status(201).send("User created");
-  };
-
-  static editUser = async (req: Request, res: Response) => {
-    // Get the ID from the url
-    const id = req.params.id;
-
-    // Get values from the body
-    const { username, role } = req.body;
-
-    // Try to find user on database
-    const userRepository = getRepository(User);
-    let user;
+  }
+  /**
+   * Detail
+   * @param request
+   * @param response
+   */
+  public static async Detail(request: Request, response: Response) {
     try {
-      user = await userRepository.findOneOrFail(id);
+      // Prepare User Repository &  Find the user based on UUID
+      const UserRepository = getRepository(User);
+      var UserDetail = await UserRepository.findOneOrFail({
+        withDeleted: true,
+        where: { uuid: request.params.uuid },
+        relations: ["roles", "permissions"],
+      })
+        .then((good) => {
+          // Return the result with 200
+          return response.status(200).send(
+            success({
+              name: "SuccessFetchUserDetail",
+              message: "Success",
+              data: good,
+            })
+          );
+        })
+        .catch((error) => {
+          // Return the result with 200
+          return response.status(404).send(success(error));
+        });
     } catch (error) {
-      // If not found, send a 404 response
-      res.status(404).send("User not found");
-      return;
+      // Return Error Result
+      return response.status(500).send(failed(error));
     }
+  }
 
-    // Validate the new values on model
-    user.username = username;
-    user.role = role;
-    const errors = await validate(user);
-    if (errors.length > 0) {
-      res.status(400).send(errors);
-      return;
-    }
-
-    // Try to safe, if fails, that means username already in use
+  /**
+   * Detail
+   * @param request
+   * @param response
+   */
+  public static async Update(request: Request, response: Response) {
     try {
-      await userRepository.save(user);
-    } catch (e) {
-      res.status(409).send("username already in use");
-      return;
-    }
-    // After all send a 204 (no content, but accepted) response
-    res.status(204).send();
-  };
+      // Destructure the body
+      var {
+        email,
+        firstname,
+        lastname,
+        password,
+        bio,
+        permissions,
+        roles,
+      } = request.body;
 
-  static deleteUser = async (req: Request, res: Response) => {
-    // Get the ID from the url
-    const id = req.params.id;
+      // Prepare User Repository
+      const UserRepository = getRepository(User);
 
-    const userRepository = getRepository(User);
-    let user: User;
-    try {
-      user = await userRepository.findOneOrFail(id);
+      // Find the user based on UUID
+      var UserDetail = await UserRepository.findOne({
+        where: { uuid: request.params.uuid },
+        relations: ["roles", "permissions"],
+      });
+
+      // Populate with new values
+      UserDetail.email = email;
+      UserDetail.firstname = firstname;
+      UserDetail.lastname = lastname;
+      UserDetail.bio = bio;
+
+      // If Password is Filled, update it
+      if (password) {
+        UserDetail.password = password;
+        UserDetail.hashPassword();
+      }
+      // If Perms is Filled, update it
+      if (permissions) {
+        const PermisssionRepository = getRepository(Permission);
+        var NewPermissions: Permission[] = [];
+        permissions.split(",").map((item) => {
+          PermisssionRepository.findOneOrFail(item).then((success) =>
+            NewPermissions.push(success)
+          );
+        });
+        UserDetail.permissions = NewPermissions;
+      }
+      // If Role is Filled, update it
+      if (roles) {
+        const RoleRepository = getRepository(Role);
+        var NewRoles: Role[] = [];
+        permissions.split(",").map((item) => {
+          RoleRepository.findOneOrFail(item).then((success) =>
+            NewRoles.push(success)
+          );
+        });
+        UserDetail.roles = NewRoles;
+      }
+      // If file is uploaded, update it
+      if (request.file) {
+        UserDetail.profile_image = request.file.filename;
+      }
+
+      // Save the new Data
+      await UserRepository.save(UserDetail);
+
+      // Return the result with 200
+      return response.status(200).send(
+        success({
+          name: "SuccessUpdateUser",
+          message: "Success",
+        })
+      );
     } catch (error) {
-      res.status(404).send("User not found");
-      return;
+      // Return Error Result
+      return response.status(500).send(failed(error));
     }
-    userRepository.delete(id);
+  }
 
-    // After all send a 204 (no content, but accepted) response
-    res.status(204).send();
-  };
+  /**
+   * Delete
+   * @param request
+   * @param response
+   */
+  public static async Delete(request: Request, response: Response) {
+    try {
+      const UserRepository = getRepository(User);
+      var WaitingList: User[] = [];
+      await Promise.all(
+        request.body.list.map(async (item) => {
+          await UserRepository.findOneOrFail({ where: { uuid: item } }).then(
+            (success) => {
+              WaitingList.push(success);
+            }
+          );
+        })
+      );
+
+      // Delete Everything
+      await UserRepository.remove(WaitingList);
+
+      // Success returns
+      return response.status(200).send(
+        success({
+          name: "SuccessDeleteUser(s)",
+          message: "User(s) successfully deleted.",
+        })
+      );
+    } catch (error) {
+      // Return Error Result
+      return response.status(500).send(failed(error));
+    }
+  }
+
+  /**
+   * Deactivate
+   * @param request R
+   * @param response
+   */
+  public static async SoftDelete(request: Request, response: Response) {
+    const UserRepository = getRepository(User);
+    try {
+      var WaitingList: User[] = [];
+      await Promise.all(
+        request.body.list.map(async (item) => {
+          await UserRepository.findOneOrFail({ where: { uuid: item } }).then(
+            (success) => {
+              WaitingList.push(success);
+            }
+          );
+        })
+      );
+
+      // Deactivate Everything
+      await UserRepository.softRemove(WaitingList);
+
+      // Success returns
+      return response.status(200).send(
+        success({
+          name: "SuccessDeactivateUser(s)",
+          message: "User(s) successfully deactivated.",
+        })
+      );
+    } catch (error) {
+      // Return Error Result
+      return response.status(500).send(failed(error));
+    }
+  }
+
+  /**
+   * Restore Deleted Data
+   * @param request
+   * @param response
+   */
+  public static async Restore(request: Request, response: Response) {
+    try {
+      const UserRepository = getRepository(User);
+      var WaitingList: User[] = [];
+      await Promise.all(
+        request.body.list.map(async (item) => {
+          await UserRepository.findOneOrFail({
+            withDeleted: true,
+            where: { uuid: item },
+          }).then((success) => {
+            WaitingList.push(success);
+          });
+        })
+      );
+
+      // Delete Everything
+      await UserRepository.recover(WaitingList);
+
+      // Success returns
+      return response.status(200).send(
+        success({
+          name: "SuccessRecoverUser(s)",
+          message: "User(s) successfully recovered.",
+        })
+      );
+    } catch (error) {
+      // Return Error Result
+      return response.status(500).send(failed(error));
+    }
+  }
 }
 
 export default UserController;

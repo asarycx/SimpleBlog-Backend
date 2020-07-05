@@ -11,6 +11,7 @@ export abstract class General {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
   @Generated("uuid")
   uuid: number;
 

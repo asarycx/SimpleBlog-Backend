@@ -22,12 +22,10 @@ export class Role extends General {
   @Length(4, 128)
   description: string;
 
-  @ManyToMany((type) => Permission, (permission) => permission.roles, {
-    eager: true,
-  })
+  @ManyToMany((type) => Permission, { eager: true })
   @JoinTable()
   permissions: Permission[];
 
-  @OneToMany((type) => User, (user) => user.role, { onDelete: "SET NULL" })
+  @ManyToMany((type) => User, { eager: false })
   users: User[];
 }
