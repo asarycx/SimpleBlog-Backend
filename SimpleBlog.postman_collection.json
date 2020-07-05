@@ -1,0 +1,353 @@
+{
+	"info": {
+		"_postman_id": "05974c8b-09a5-4abd-9995-158459161075",
+		"name": "SimpleBlog",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Request Self Information",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/auth/me",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "email",
+									"value": "Demetris.Conroy47@hotmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								}
+							],
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "User Index",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/user?page=1&per_page=20&keyword=thalia&sort=ASC",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "number of current page"
+								},
+								{
+									"key": "per_page",
+									"value": "20",
+									"description": "number of item per page"
+								},
+								{
+									"key": "keyword",
+									"value": "thalia",
+									"description": "keywrod for search"
+								},
+								{
+									"key": "sort",
+									"value": "ASC",
+									"description": "ASC or DESC Sort"
+								}
+							]
+						},
+						"description": "Fetch all User"
+					},
+					"response": []
+				},
+				{
+					"name": "User Detail",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:8000/api/user/09d6ba87-6b15-4eb9-9f6d-19aba541f5ee",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"09d6ba87-6b15-4eb9-9f6d-19aba541f5ee"
+							]
+						},
+						"description": "Get Detail on one specific user"
+					},
+					"response": []
+				},
+				{
+					"name": "User Update",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "uuid",
+									"value": "063e1d13-7bd9-4347-b63d-64f2a83817d9",
+									"description": "uuid needed for file upload",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "mastermiller@small.com",
+									"description": "the email",
+									"type": "text"
+								},
+								{
+									"key": "firstname",
+									"value": "The Edited",
+									"description": "1 - 32 char",
+									"type": "text"
+								},
+								{
+									"key": "lastname",
+									"value": "Name end",
+									"description": "1 - 32 char",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "newPassword",
+									"description": "8 - 32 char",
+									"type": "text"
+								},
+								{
+									"key": "bio",
+									"value": "123",
+									"description": "0 - 255 char",
+									"type": "text"
+								},
+								{
+									"key": "profile_image",
+									"description": "image only",
+									"type": "file",
+									"src": "/C:/Users/Asary/Desktop/Layer 2.png"
+								},
+								{
+									"key": "permissions",
+									"value": "1,2,3,4",
+									"description": "string with comma",
+									"type": "text"
+								},
+								{
+									"key": "roles",
+									"value": "1",
+									"description": "string with comma",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:8000/api/user/41189002-586e-4308-a4ad-05f0e8324ded",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"41189002-586e-4308-a4ad-05f0e8324ded"
+							]
+						},
+						"description": "Get Detail on one specific user"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User(s)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"list\":[\n\t\t\"41189002-586e-4308-a4ad-05f0e8324ded\",\n\t\t\"6447ce4b-a39e-43e0-a9ac-6d6cd9a74553\"\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/user",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Soft Delete User(s)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"list\":[\n\t\t\"09d6ba87-6b15-4eb9-9f6d-19aba541f5ee\"\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/user/soft",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"soft"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Recover User(s)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcyMjNhZDdlLWZhZGYtNGE4Yy05YzJmLTNkMmE1ZDQ2YjMwYSIsInVzZXJuYW1lIjoiUmlja2llX1dpbGwiLCJlbWFpbCI6IkRlbWV0cmlzLkNvbnJveTQ3QGhvdG1haWwuY29tIiwiaWF0IjoxNTkzOTEyOTAzLCJleHAiOjE1OTM5MzQ1MDN9.O1vyKKrWVFlrUnj5t7hA3SBCy20Hz9eQQzwjddHrg70"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"list\":[\n\t\t\"09d6ba87-6b15-4eb9-9f6d-19aba541f5ee\"\n\t]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8000/api/user/recover",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"user",
+								"recover"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}
